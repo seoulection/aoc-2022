@@ -1,40 +1,41 @@
-list =
-  "input.txt"
-  |> File.read!()
-  |> String.trim_trailing()
-  |> String.split("\n\n")
+defmodule DayOne do
+  def part_one do
+    get_input()
+    |> Enum.reduce(0, &run_one/2)
+  end
 
-num_string_to_num_list = fn num_string ->
-  num_string
-  |> String.split("\n")
-  |> Enum.map(&String.to_integer/1)
-end
+  def part_two do
+    get_input()
+    |> Enum.map(&get_sum/1)
+    |> Enum.sort(:desc)
+    |> Enum.slice(0..2)
+    |> Enum.sum()
+  end
 
-# PART ONE
-list
-|> Enum.reduce(0, fn num_string, acc ->
-  num_string
-  |> num_string_to_num_list.()
-  |> Enum.reduce(fn num, acc -> num + acc end)
-  |> then(fn max ->
-    if max > acc do
-      max
+  defp run_one(list, acc) do
+    sum = get_sum(list)
+
+    if sum >= acc do
+      sum
     else
       acc
     end
-  end)
-end)
-|> IO.inspect(label: "PART ONE ANSWER")
+  end
 
-# PART TWO
-list
-|> Enum.map(fn num_string ->
-  num_string
-  |> num_string_to_num_list.()
-  |> Enum.reduce(fn num, acc -> num + acc end)
-end)
-|> Enum.sort(:desc)
-|> then(fn [first, second, third | _rest] ->
-  first + second + third
-end)
-|> IO.inspect(label: "PART TWO ANSWER")
+  defp get_sum(list) do
+    list
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.sum()
+  end
+
+  defp get_input do
+    "input.txt"
+    |> File.read!()
+    |> String.trim_trailing()
+    |> String.split("\n\n")
+    |> Enum.map(&String.split(&1, "\n", trim: true))
+  end
+end
+
+DayOne.part_one() |> IO.inspect(label: "PART ONE ANSWER")
+DayOne.part_two() |> IO.inspect(label: "PART TWO ANSWER")
